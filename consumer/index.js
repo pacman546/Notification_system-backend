@@ -20,7 +20,7 @@ async function startConsumer() {
 
     
     const healthApp = express();
-    const HEALTH_PORT = process.env.HEALTH_PORT || 3001;
+    const HEALTH_PORT = process.env.PORT || 3001;
 
     healthApp.get('/health', (req, res) => res.send('OK'));
 

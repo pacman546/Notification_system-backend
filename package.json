@@ -1,0 +1,29 @@
+{
+  "name": "insyd-notification-system-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon producer/server.js",
+    "start": "node producer/server.js",
+    "dev:consumer": "nodemon consumer/index.js",
+    "start:consumer": "node consumer/index.js",
+    "dev:ws": "nodemon server.js",
+    "start:ws": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "amqplib": "^0.10.8",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "mongoose": "^8.14.3",
+    "redis": "^5.0.1",
+    "redis-server": "^1.2.2",
+    "uuid": "^11.1.0",
+    "ws": "^8.18.2",
+    "zod": "^3.24.4"
+  }
+}

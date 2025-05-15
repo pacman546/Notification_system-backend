@@ -11,14 +11,6 @@ function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-async function connectMongo() {
-  await mongoose.connect('mongodb://localhost:27017/yourdb', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
-  console.log('MongoDB connected');
-}
-
 async function startWorker() {
   try {
     if (mongoose.connection.readyState !== 1) {

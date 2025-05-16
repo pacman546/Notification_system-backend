@@ -10,7 +10,8 @@
     "dev:consumer": "nodemon consumer/index.js",
     "start:consumer": "node consumer/index.js",
     "dev:ws": "nodemon server.js",
-    "start:ws": "node server.js"
+    "start:ws": "node server.js",
+    "start:worker":"node jobs/worker.js"
   },
   "keywords": [],
   "author": "",

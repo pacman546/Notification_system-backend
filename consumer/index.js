@@ -10,10 +10,10 @@ async function startConsumer() {
   try {
     await connectDB();
     await connectRedis();
-    await connectRabbitMQ(); // from producer
+    await connectRabbitMQ(); 
     await connectAndConsume();
 
-    startPendingDeliveryWorker(5); // every 5 minutes
+    startPendingDeliveryWorker(5);
     startPendingNotificationSaver();
     console.log('Consumer started and listening for messages...');
   } catch (error) {

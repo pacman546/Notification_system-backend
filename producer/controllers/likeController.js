@@ -1,6 +1,12 @@
 import { getChannel } from '../services/mqService.js';
 
+
+
+
 async function likeEvent(req, res) {
+  console.log('Connecting to RabbitMQ at:', process.env.RABBITMQ_URL);
+console.log('Queue name:', process.env.QUEUE_NAME || 'notification.event');
+
   const { actorId, targetId, postId, type } = req.body;
 
   if (!actorId || !targetId || !postId || type !== 'LIKE') {
@@ -17,7 +23,7 @@ async function likeEvent(req, res) {
 
   try {
     const channel = getChannel();
-    await channel.sendToQueue('notifications.events', Buffer.from(JSON.stringify(event)), {
+    await channel.sendToQueue('notification.event', Buffer.from(JSON.stringify(event)), {
       persistent: true,
     });
     console.log(`[→] Event sent to MQ: ${type} by ${actorId} on post ${postId}`);

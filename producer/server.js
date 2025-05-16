@@ -1,9 +1,11 @@
 import dotenv from 'dotenv';
-import express from 'express';
-import likeRoutes from './routes/likeRoutes.js';
-import { connectRabbitMQ } from './services/mqService.js';
-
 dotenv.config();
+import express from 'express';
+import { connectRabbitMQ } from './services/mqService.js';
+import likeRoutes from './routes/likeRoutes.js';
+
+
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 

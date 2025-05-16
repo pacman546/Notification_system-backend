@@ -4,20 +4,13 @@ import mongoose from 'mongoose';
 import Notification from '../models/notificationModel.js'; 
 
 const RABBITMQ_URL = process.env.RABBITMQ_URL; 
-const QUEUE_NAME = 'notifications.delivery';
+const QUEUE_NAME = 'notifications.savemessages';
 
 // Helper delay function
 function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-async function connectMongo() {
-  await mongoose.connect('mongodb://localhost:27017/yourdb', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
-  console.log('MongoDB connected');
-}
 
 async function startWorker() {
   try {
@@ -25,10 +18,14 @@ async function startWorker() {
       await connectDB(); 
     }
 
+    console.log('Connected to RabbitMQ:', RABBITMQ_URL);
+   
+
     const connection = await amqplib.connect(RABBITMQ_URL);
     const channel = await connection.createChannel();
 
     const queue = QUEUE_NAME;
+    console.log('Asserted queue:', queue);
     await channel.assertQueue(queue, { durable: true });
 
     console.log(`[*] Waiting for messages in ${queue}`);
@@ -36,6 +33,7 @@ async function startWorker() {
     channel.consume(
       queue,
       async (msg) => {
+        console.log('⚡ MQ message received');
         if (msg !== null) {
           try {
             const data = JSON.parse(msg.content.toString());
@@ -43,6 +41,7 @@ async function startWorker() {
 
             console.log(`⏳ Waiting 2 minutes before saving notification ${data.notificationId} to MongoDB`);
             await delay(2 * 60 * 1000);  // 2 minutes delay
+
 
             await Notification.findOneAndUpdate(
               { notificationId: data.notificationId },

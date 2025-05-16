@@ -24,7 +24,7 @@ export function setupWebSocket(server) {
             onlineUsers.set(userId, ws);
             console.log(`WebSocket authenticated for user ${userId}`);
   
-            const redisKey = `notifications:${userId}`;
+            const redisKey = `notifications:buffer:${userId}`;
             const pending = await redisClient.lRange(redisKey, 0, -1);
             const pendingCount = pending.filter(msg => JSON.parse(msg).status === 'pending').length;
             console.log(`Pending messages for user ${userId}: ${pending.length}`);
@@ -40,53 +40,51 @@ export function setupWebSocket(server) {
   
           if (parsed.type === 'ACK' && userId) {
             const { notificationId } = parsed;
-            const redisKey = `notifications:${userId}`;
+            const redisKey = `notifications:buffer:${userId}`;
             const all = await redisClient.lRange(redisKey, 0, -1);
-  
+          
             for (let i = 0; i < all.length; i++) {
               const entry = JSON.parse(all[i]);
               if (entry.notificationId === notificationId) {
                 entry.status = 'delivered';
-                await redisClient.lSet(redisKey, i, JSON.stringify(entry));
+          
+                const updatedEntry = JSON.stringify(entry);
+          
+                // 1. Update the Redis entry
+                await redisClient.lSet(redisKey, i, updatedEntry);
                 console.log(`ACK received. Updated Redis status for ${notificationId} to delivered`);
-                
-                // Cleanup Redis list to remove all delivered messages
-                const all = await redisClient.lRange(redisKey, 0, -1);
-                const filtered = all.filter(item => {
-                  const obj = JSON.parse(item);
-                  return obj.status !== 'delivered';
-                });
-
-                await redisClient.del(redisKey);
-                if (filtered.length > 0) {
-                  await redisClient.rPush(redisKey, ...filtered);
-                }
-               
+          
+                // 2. Send to MQ before removing
                 try {
                   const channel = getChannel();
                   const ackPayload = {
                     userId,
                     notificationId,
                     status: 'delivered',
-                    message: entry.message, 
+                    message: entry.message,
                     timestamp: new Date().toISOString()
                   };
-  
+          
+                  console.log('Sending ACK payload to MQ:', ackPayload);
                   await channel.sendToQueue(
-                    'notifications.delivery',
+                    'notifications.savemessages',
                     Buffer.from(JSON.stringify(ackPayload)),
                     { persistent: true }
                   );
-  
+                  console.log('Message sent to MQ');
+                            
                   console.log(`Sent delivered status to MQ for notification ${notificationId}`);
                 } catch (err) {
                   console.error('Failed to send ACK to MQ:', err);
                 }
-  
+          
+                // 3. Remove only this delivered entry
+                await redisClient.lRem(redisKey, 1, updatedEntry);
                 break;
               }
             }
           }
+          
   
         } catch (err) {
           console.error('Failed to parse WS message:', err);

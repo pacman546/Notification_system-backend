@@ -10,9 +10,9 @@ async function startPendingNotificationSaver() {
   try {
     const channel = getChannel();
 
-    await channel.assertQueue('notifications.delivery', { durable: true });
+    await channel.assertQueue('notifications.savemessages', { durable: true });
 
-    channel.consume('notifications.delivery', async (msg) => {
+    channel.consume('notifications.savemessages', async (msg) => {
       if (msg !== null) {
         try {
           const content = JSON.parse(msg.content.toString());
@@ -47,7 +47,7 @@ async function startPendingNotificationSaver() {
       }
     }, { noAck: false });
 
-    console.log('Pending notification saver started, listening on notifications.delivery queue');
+    console.log('Pending notification saver started, listening on notifications.savemessages queue');
 
   } catch (err) {
     console.error('[x] Failed to start pending notification saver:', err);

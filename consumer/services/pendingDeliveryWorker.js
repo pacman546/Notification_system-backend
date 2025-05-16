@@ -33,7 +33,7 @@ async function scanPendingMessagesAndPush() {
           .map(msg => ({ ...msg, userId })); // Add userId to each message
       
         for (const msg of pendingMessages) {
-          channel.sendToQueue('notifications.delivery', Buffer.from(JSON.stringify(msg)), {
+          channel.sendToQueue('notifications.savemessages', Buffer.from(JSON.stringify(msg)), {
             persistent: true,
           });
         }

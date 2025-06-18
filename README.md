@@ -1,6 +1,6 @@
-# Insyd Notification System - Scalable Backend (POC)
+# Notification System - Scalable Backend (POC)
 
-This is a production-grade, proof-of-concept backend for **Insyd**, a next-gen social web platform for the Architecture industry. The system is designed to handle **high-throughput notification workloads** (like, comment, follow, etc.) at scale — capable of supporting **10K-100K DAU** — while being **cost-effective**, **lightweight**, and **non-blocking** to core features like feed rendering and content publishing.
+This is a production-grade, proof-of-concept backend. The system is designed to handle **high-throughput notification workloads** (like, comment, follow, etc.) at scale — capable of supporting **10K-100K DAU** — while being **cost-effective**, **lightweight**, and **non-blocking** to core features like feed rendering and content publishing.
 
 ---
 
